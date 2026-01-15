@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+use App\Models\Pizza;
+
+class PizzaController extends Controller
+{
+    public function showAllPizzas()
+    {
+        $pizzas = Pizza::all();
+        return view('pizzas.showAllPizzas', compact('pizzas'));
+    }
+
+    public function showOnePizza($id)
+    {
+        $pizza = Pizza::findOrFail($id);
+        $ingredientes = Pizza::with('ingredientes')->findOrFail($id);
+        return view('pizzas.showOnePizza', compact('pizza'));
+    }
+
+    public function showAllPizzasAndIngredientes()
+    {
+        $pizzas = Pizza::with('ingredientes')->get();
+        return view('pizza.showAllPizzasAndIngredientes', compact('pizzas'));
+    }
+
+    public function store(Request $request){
+        $request->validate([
+            'nombre' => 'required',
+            'descripcion' => 'required',
+            'precio' => 'required|numeric',
+            'ingredientes' => 'array'
+        ],
+        [
+            'nombre.required' => 'El nombre es obligatorio.',
+            'descripcion.required' => 'La descripcion es obligatoria.',
+            'precio.required' => 'El precio es obligatorio.',
+            'precio.numeric' => 'El precio debe ser un número.',
+            'ingredientes.array' => 'Los ingredientes no son válidos.'
+        ]
+        );
+    }
+}
